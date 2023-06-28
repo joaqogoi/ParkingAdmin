@@ -1,0 +1,70 @@
+ParkingAdmin formato final.
+[
+    "sucursal" : {
+                           "id": 
+                           "direccion":
+			   "montoXhora":
+			   "encargados" : [{
+                                            "dni":
+                                            "nombre"
+                                                    }]
+                            "InOut" : [{
+                                "id":
+                                "horario_entrada":
+                                "horario_salida":
+                                "cliente": { 
+                                            "dni":
+                                            "nombre":
+                                            "vehiculos": [{
+                                                          "patente":
+                                                          "modelo":
+                                                                   }]
+                                                   }
+                                 "facturacion": {
+                                                 "id" : 
+                                                 "tiempo" :
+                                                 "monto" :
+                                                           }
+                                  }]
+                                  
+                  }
+]
+
+
+Paq Domain:
+
+public class Sucursal {
+	private static int contadorIds = 0;
+	private final int id;
+	private String direccion;
+	private double valorXhora;
+	private List<InOut> listaInOut;
+	private List<Encargado> listaEncargados;
+
+public class Encargado extends UsuarioABS{
+	private double id;
+	private String name;
+
+public class InOut {
+	private static int contadorIDs = 0;
+	private final int id;
+	private Encargado encargado;
+	private Cliente cliente;
+	private Sucursal sucursal;
+	private LocalDateTime in;
+	private LocalDateTime out;
+	private Factura facturacion;
+
+public class Cliente extends UsuarioABS{
+	private double id;
+	private String name;
+	private List<Vehiculo> vehiculos;
+
+public class Vehiculo {
+	private double id;
+	private String mod;
+
+public class Factura {
+	private double id;
+	private double time;
+	private double monto;
