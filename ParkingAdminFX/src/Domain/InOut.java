@@ -41,6 +41,7 @@ public class InOut {
 		double valorXhora = sucursal.getValorXhora();
 		return horasPermanencia * valorXhora;
 	}
+	
 	//preguntar en clase como afecteria el cambiar el metodo getValorXhora a static
 	//rodearlo con un trycatch no es simplemente una manera de emascarar el problema?
 	

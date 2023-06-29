@@ -1,9 +1,11 @@
 package Service;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
 import Domain.Sucursal;
 
 public interface I_GsonService {
-	public Gson convertirJavaToJson(Sucursal sucursal);
-	public Sucursal convertirJsonToJava(Gson gson);
+	public JsonElement convertirJavaToJson(Sucursal sucursal);
+	public Sucursal convertirJsonToJava(JsonElement jsonElement);
+	public void guardarJsonEnData(JsonElement jsonElement);
 }
