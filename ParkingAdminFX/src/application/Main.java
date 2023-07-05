@@ -9,64 +9,84 @@ import javafx.stage.Stage;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
 import Domain.*;
+import Service.*;
 
 public class Main extends Application {
 
 	public void start(Stage primaryStage) {
 		
 // creacion pantalla principal
-		Button button = new Button("Administracion");
-		Button button2 = new Button("Registrar ingreso");
-		Button button3 = new Button("Registrar salida");
-		VBox vbox = new VBox(10);
-		vbox.getChildren().addAll(button, button2, button3);
-		vbox.setAlignment(Pos.CENTER);
-
-		BorderPane ventanaPrincipal = new BorderPane();
-		ventanaPrincipal.setCenter(vbox);
-
-		Scene scene = new Scene(ventanaPrincipal, 300, 250);
-		primaryStage.setTitle("Bienvenido");
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-// Ajustes de pantalla administracion
-		button.setOnAction(e -> {
-			Stage admiP = new Stage();
-			admiP.setTitle("Administracion");
-			GridPane registrarIngresoA = new GridPane();
-			Scene ingresoA = new Scene(registrarIngresoA, 400, 200);
-			registrarIngresoA.setPadding(new Insets(10));
-			registrarIngresoA.setVgap(4);
-			registrarIngresoA.setHgap(6);
-			
+		Stage pagP = new Stage();
+		pagP.setTitle("Inicio");
+		GridPane pantallaPrincipal = new GridPane();
+		Scene inicio = new Scene(pantallaPrincipal, 400, 200);
+		pantallaPrincipal.setPadding(new Insets(10));
+		pantallaPrincipal.setVgap(4);
+		pantallaPrincipal.setHgap(4);
+		
 // Creacion de textos, cuadros de texto y botones
-			Label sucursales = new Label("Sucursales");
-			ComboBox sucursal = new ComboBox();
-			sucursal.setItems(FXCollections.observableArrayList("Sucursal 1", "Sucursal 2", "Sucursal 3"));
-			Label encargado = new Label("Datos del encargado");
-			Label encargadoN = new Label("Nombre");
-			TextField textfield1 = new TextField();
-			Label encargadoD = new Label("DNI");
-			TextField textfield2 = new TextField();
-			Button guardar2 = new Button("Guardar");
-			
+		Label sucursales = new Label("Sucursales");
+		ComboBox sucursal = new ComboBox();
+		sucursal.setItems(FXCollections.observableArrayList("Sucursal 1", "Sucursal 2", "Sucursal 3"));
+		Label encargados = new Label("Encargados");
+		ComboBox encargado = new ComboBox();
+		encargado.setItems(FXCollections.observableArrayList("Encargado 1", "Encargado 2", "Encargado 3"));
+		Button button = new Button("Registrar ingreso");
+		Button button2 = new Button("Registrar salida");
+		Button button3 = new Button("Sucursales");
+		Button button4 = new Button("Encargados");
+		Button button5 = new Button("Finalizar turno");
+		
 // Agregar los botones a la pantalla y seleccionar su ubicacion
-			registrarIngresoA.add(sucursales, 0, 1);
-			registrarIngresoA.add(sucursal, 2, 1);
-			registrarIngresoA.add(encargado, 0, 4);
-			registrarIngresoA.add(encargadoN, 0, 5);
-			registrarIngresoA.add(textfield1, 2, 5);
-			registrarIngresoA.add(encargadoD, 0, 6);
-			registrarIngresoA.add(textfield2, 2, 6);
-			registrarIngresoA.add(guardar2, 0, 8);
-// Mostrar pagina
-			admiP.setScene(ingresoA);
-			admiP.show();
-		});
+		pantallaPrincipal.add(sucursales, 0, 1);
+		pantallaPrincipal.add(sucursal, 2, 1);
+		pantallaPrincipal.add(encargados, 0, 4);
+		pantallaPrincipal.add(encargado, 2, 4);
+		pantallaPrincipal.add(button, 0, 6);
+		pantallaPrincipal.add(button2, 2, 6);
+		pantallaPrincipal.add(button3, 4, 6);
+		pantallaPrincipal.add(button4, 0, 8);
+		pantallaPrincipal.add(button5, 2, 8);
 
-// Ajustes de pantalla Registrar ingreso
-		button2.setOnAction(e -> {
+//Mantener las opciones ocultas hasta seleccionar una sucursal
+		encargados.setVisible(false);
+		encargado.setVisible(false);
+		button.setVisible(false);
+		button2.setVisible(false);
+		button3.setVisible(false);
+		button4.setVisible(false);
+		button5.setVisible(false);
+
+		
+		sucursal.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+		
+		    if (newValue != null) {
+		        encargados.setVisible(true);
+		        encargado.setVisible(true);
+		        button.setVisible(true);
+		        button2.setVisible(true);
+		        button3.setVisible(true);
+		        button4.setVisible(true);
+		        button5.setVisible(true);
+		    
+		    } else {
+		        encargados.setVisible(false);
+		        encargado.setVisible(false);
+		        button.setVisible(false);
+		        button2.setVisible(false);
+		        button3.setVisible(false);
+		        button4.setVisible(false);
+		        button5.setVisible(false);
+		    
+		    }
+		});
+		
+// Mostrar pagina
+					pagP.setScene(inicio);
+					pagP.show();
+					
+// Creacion y ajustes de pantalla Registrar ingreso
+		button.setOnAction(e -> {
 			Stage ingresoP = new Stage();
 			ingresoP.setTitle("Registrar ingreso");
 			GridPane registrarIngresoP = new GridPane();
@@ -92,17 +112,14 @@ public class Main extends Application {
 				
 // Obtener los datos que se ingresan
 				String nombreCliente = textfield3.getText();
-				String dniCliente = textfield4.getText();
+				double dniCliente = Double.parseDouble(textfield4.getText());
 				String modeloVehiculo = textfield5.getText();
-				String patenteVehiculo = textfield6.getText();
+				double patenteVehiculo = Double.parseDouble(textfield6.getText());
 				
 
-				// Instancia de la clase Cliente
-				// UsuarioABS datosCliente = new UsuarioABS();
-				// Asignar valores
-				// Cliente.setName(nombreCliente);
-				// Acceder a las variables de Cliente y Vehiculo
-				// String NombreC = Cliente.getName();
+// Instancia de la clase Cliente
+				//SucursalService sucursalService = new SucursalService(null);
+//sucursalService.agregarEventoInOut(dniCliente, nombreCliente, patenteVehiculo, modeloVehiculo);
 
 			});
 			
@@ -123,21 +140,156 @@ public class Main extends Application {
 // Mostrar pagina
 			ingresoP.setScene(ingreso);
 			ingresoP.show();
-
+		
 		});
 		
-// Ajustes de pantalla Registrar salida
-		button3.setOnAction(e -> {
-			Stage newStage = new Stage();
-			newStage.setTitle("Registrar Salida");
-			VBox registrarSalida = new VBox();
-			Scene salida = new Scene(registrarSalida, 200, 200);
-			newStage.setScene(salida);
-			newStage.show();
+// Creacion y ajustes de pantalla Registrar salida
+		button2.setOnAction(e -> {
+			Stage salida = new Stage();
+			salida.setTitle("Registrar salida");
+			GridPane registrarSalida = new GridPane();
+			registrarSalida.setPadding(new Insets(10));
+			registrarSalida.setVgap(4);
+			registrarSalida.setHgap(6);
+			
+// Creacion de textos, cuadros de texto y botones
+			Label factura = new Label("Factura");
+			TextField textfield7 = new TextField();
+			//cuadro con los datos
+			Button finalizar = new Button("Finalizar");			
 
-		});
-	}
+// Ajustes del boton guardar
+			finalizar.setOnAction(evento2 -> {	
+						});
+						
+// Agregar los botones a la pantalla y seleccionar su ubicacion
+			registrarSalida.add(factura, 0, 1);
+			registrarSalida.add(textfield7, 2, 1);
+			//cuadro con los datos
+			registrarSalida.add(finalizar, 3, 1);
+			Scene salidaP = new Scene(registrarSalida, 400, 200);
+
+// Mostrar pagina
+			salida.setScene(salidaP);
+			salida.show();	 
+					});
+
+// Creacion y ajustes de pantalla Sucursales
+			button3.setOnAction(e -> {
+			Stage ajustesS = new Stage();
+			ajustesS.setTitle("Sucursales");
+			GridPane Sucursal = new GridPane();
+			Sucursal.setPadding(new Insets(10));
+			Sucursal.setVgap(4);
+			Sucursal.setHgap(6);
+					
+// Creacion de textos, cuadros de texto y botones
+			Label datosS = new Label("Datos de la nueva sucursal");
+			Label direccion = new Label("Direccion");
+			TextField textfield7 = new TextField();
+			Label valorXhora = new Label("Valor por hora");
+			TextField textfield8 = new TextField();
+			Button nuevaS = new Button("Nueva sucursal");			
+
+// Ajustes del boton guardar
+			nuevaS.setOnAction(evento2 -> {	
+								});
+								
+// Agregar los botones a la pantalla y seleccionar su ubicacion
+			Sucursal.add(datosS, 0, 1);
+			Sucursal.add(direccion, 0, 3);
+			Sucursal.add(textfield7, 1, 3);
+			Sucursal.add(valorXhora, 0, 4);
+			Sucursal.add(textfield8, 1, 4);
+			Sucursal.add(nuevaS, 0, 6);
+			Scene sucursalP = new Scene(Sucursal, 400, 200);
+
+// Mostrar pagina
+			ajustesS.setScene(sucursalP);
+			ajustesS.show();	 
+							});	
+			
+// Creacion y ajustes de pantalla Encargados
+			button4.setOnAction(e -> {
+			Stage ajustesE = new Stage();
+			ajustesE.setTitle("Encargados");
+			GridPane Encargado = new GridPane();
+			Encargado.setPadding(new Insets(10));
+			Encargado.setVgap(4);
+			Encargado.setHgap(6);		
+			
+// Creacion de textos, cuadros de texto y botones
+			Label datosE = new Label("Datos del nuevo encargado");
+			Label nombreE = new Label("Nombre");
+			TextField textfield9 = new TextField();
+			Label dniE = new Label("DNI");
+			TextField textfield10 = new TextField();
+			Button nuevoE = new Button("Contratar encargado");			
+
+// Ajustes del boton guardar
+			nuevoE.setOnAction(evento2 -> {	
+											});
+											
+// Agregar los botones a la pantalla y seleccionar su ubicacion
+			Encargado.add(datosE, 0, 1);
+			Encargado.add(nombreE, 0, 3);
+			Encargado.add(textfield9, 1, 3);
+			Encargado.add(dniE, 0, 4);
+			Encargado.add(textfield10, 1, 4);
+			Encargado.add(nuevoE, 0, 6);
+			Scene encargadoP = new Scene(Encargado, 400, 200);
+
+// Mostrar pagina
+			ajustesE.setScene(encargadoP);
+			ajustesE.show();	 
+							});	
+// Creacion y ajustes de pantalla Facturar
+			button5.setOnAction(e -> {
+			Stage facturar = new Stage();
+			facturar.setTitle("Facturar");
+			GridPane facturacion = new GridPane();
+			facturacion.setPadding(new Insets(10));
+			facturacion.setVgap(4);
+			facturacion.setHgap(6);		
+						
+// Creacion de textos, cuadros de texto y botones
+			Label facturarDia = new Label("Calcular la facturacion de la jornada");
+			Button calcular = new Button("Calcular");
+			//cuadro con los datos
+			Button guardarF = new Button("Guardar");		
+			Button finalizar = new Button("Terminar jornada");
+// Ajustes del boton guardar
+			guardarF.setOnAction(evento2 -> {	
+														});
+// Ajustes del boton terminar jornada
+			finalizar.setOnAction(evento3 -> {	
+			Stage stage = (Stage) finalizar.getScene().getWindow();
+		    stage.close();
+				  });
+
+								
+														
+// Agregar los botones a la pantalla y seleccionar su ubicacion
+			facturacion.add(facturarDia, 0, 1);
+			facturacion.add(calcular, 0, 3);
+			//cuadro con los datos
+			facturacion.add(guardarF, 0, 6);
+			facturacion.add(finalizar, 1, 6);
+			
+			Scene facturacionP = new Scene(facturacion, 400, 200);
+
+// Mostrar pagina
+			facturar.setScene(facturacionP);
+			facturar.show();	 
+										});	
+			
+			
+		}
+	
 
 	public static void main(String[] args) {
 		launch(args);
-	}}
+	}
+
+}
+
