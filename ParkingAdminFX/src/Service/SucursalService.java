@@ -12,6 +12,7 @@ public class SucursalService {
 	private Encargado encargadoActivo;
 	
 	public SucursalService(GsonService gsonService) {
+		//instancia del paq Gson para la implementacion de sus metodos. 
 		this.gsonService = gsonService;
 	}
 	
@@ -20,21 +21,66 @@ public class SucursalService {
 		sucursalActiva = new Sucursal(direccion, valorXhora);
 	}
 	
-	public void cargarSucursal(JsonElement jsonElement) {
-		sucursalActiva = gsonService.convertirJsonToJava(jsonElement);
+	public void cargarSucursal(int idSucursal) {
+		GsonService gsonService = new GsonService();
+		List<Sucursal> listaSucursales = gsonService.convertirLista("baseDeDatos.Json");
+		//recorremos la lista de sucursales de la base de datos y seleccionamos la sucursalActiva
+		for (Sucursal sucursal : listaSucursales) {
+			if(sucursal.getId() == idSucursal) {
+				
+				//guardamos el valor del id para el ultimo evento registrado
+				int ultimoRegistro = 0;
+				List<InOut> listaDeRegistros = sucursal.getListaInOut();
+				for (InOut registro : listaDeRegistros) {
+					if (registro.getId() > ultimoRegistro) {
+						ultimoRegistro = registro.getId();
+					}
+				}
+				
+				sucursalActiva = sucursal;
+				//limpiamos la lista de eventos InOut para comenzar el turno
+				sucursalActiva.getListaInOut().clear();
+				InOut.setContadorIDs(ultimoRegistro);
+				break;
+			}
+		}
 	}
 	
 	public void guardarSucursal() {
-		List<InOut> eventosSinSalida = sucursalActiva.getListaInOut();
-		for(InOut evento : eventosSinSalida) {
-			if (evento.getOut() == null) {
-				System.out.println("Existen ingresos que no registran salida no se puede grabar la lista en la base de datos mientras existan ingresos sin finalizar");
-				return;
+		GsonService gsonService = new GsonService();
+		List<Sucursal> listaSucursales = gsonService.convertirLista("baseDeDatos.json");
+		
+		//busqueda de sucursalActiva por id
+		Sucursal sucursalActualizada = null;
+		for (Sucursal sucursal : listaSucursales) {
+			if (sucursal.getId() == sucursalActiva.getId()) {
+				//actualizacion de la lista de eventosInOut
+				sucursal.getListaInOut().addAll(sucursalActiva.getListaInOut());
+				sucursalActualizada = sucursal;
+				break;
 			}
 		}
-		JsonElement jsonElement = gsonService.convertirJavaToJson(sucursalActiva);
-		gsonService.guardarJsonEnData(jsonElement);
+		if (sucursalActualizada != null) {
+			//convetir sucursal a Json
+			JsonElement jsonElement = gsonService.convertirJavaToJson(sucursalActualizada);
+			//guarda Json en la base de datos
+			instanciaDeData.guardarEnData(jsonElement);
+		} else {
+			System.out.println("No se encuentra sucursal activa");
+		}
 	}
+	
+	//Creacion de listas para el usuario
+	public List<String> obtenerNombresEncargados(){
+		List<String> listaEncargados = new ArrayList<>();
+		List<Encargado> encargados = sucursalActiva.getListaEncargados();
+		for (Encargado encargado : encargados) {
+			String nombreEncargado = encargado.getName();
+			listaEncargados.add(nombreEncargado);
+		}
+		return listaEncargados;
+	}
+	
 	
 	//Metodos para manipular la lista de encargados:
 	public void crearEncargado(double id, String nombre) {
@@ -66,17 +112,40 @@ public class SucursalService {
 	}
 	
 	//Metodos para manipular los eventos InOut:
-	public void agregarEventoInOut(double idCliente, String nombreCliente, double patenteVehiculo, String mod) {
+	public List<String> agregarEventoInOut(double idCliente, String nombreCliente, String patente, String mod) {
+		List<String> datosEvento = new ArrayList<>();
 		if (sucursalActiva != null && encargadoActivo != null) {
 			Cliente cliente = new Cliente(idCliente, nombreCliente);
-			cliente.agregarVehiculo(patenteVehiculo, mod);
+			cliente.agregarVehiculo(patente, mod);
 			
 			InOut eventoInOut = new InOut(cliente, sucursalActiva, encargadoActivo);
 			sucursalActiva.agregarInOut(eventoInOut);
+			datosEvento = obtenerDatosEvento(eventoInOut);
 		} else {
-			System.out.println("No se puede agregar evento InOut");
+			System.out.println("No se encuentra un encargado o sucursal activos");
 		}
-	} 
+		return datosEvento;
+	}
+	
+	public List<String> obtenerDatosEvento(InOut eventoInOut){
+		List<String> datosEvento = new ArrayList<>();
+		
+		String encargadoActivo = eventoInOut.getEncargado().getName();
+		String idEvento = String.valueOf(eventoInOut.getId());
+		String horarioIngreso = eventoInOut.getIn().toString();
+		String nombreCliente = eventoInOut.getCliente().getName();
+		String patenteVehiculo = eventoInOut.getCliente().getVehiculo().getPatente();
+		String modVehiculo = eventoInOut.getCliente().getVehiculo().getMod();
+		
+		datosEvento.add(encargadoActivo);
+		datosEvento.add(idEvento);
+		datosEvento.add(horarioIngreso);
+		datosEvento.add(nombreCliente);
+		datosEvento.add(patenteVehiculo);
+		datosEvento.add(modVehiculo);
+		
+		return datosEvento;
+	}
 	
 	public void registrarSalida(double idEvento) {
 		if(sucursalActiva != null) {

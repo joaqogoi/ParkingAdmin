@@ -68,3 +68,12 @@ public class Factura {
 	private double id;
 	private double time;
 	private double monto;
+
+
+
+//agregar metodo para obter arreglo de nombres de sucursales como String (PaqData)
+//agregar un metodo para implemetar el id de sucursal correspondiente como sucursal activa implementacion de cargar de surcursal activa
+//agregar metodo que al registrar un ingreso devuelva el id factura
+//agregar un metodo que devuelva en formato string datos de la salida
+//crear metodo find desde una instancia de data.toList que recorra las sucursales y filtre por id la sucursal activa
+//

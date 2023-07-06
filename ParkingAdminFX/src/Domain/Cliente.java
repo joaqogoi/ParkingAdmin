@@ -1,25 +1,30 @@
 package Domain;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Cliente extends UsuarioABS{
 	
 	//atributos propios de la clase hija
-	private List<Vehiculo> vehiculos;
+	private Vehiculo vehiculo;
 
 	//contructor
 	public Cliente(double id, String name) {
-		super(id, name);
-		vehiculos = new ArrayList<>();	
+		super(id, name);	
 	}
+	
+	
+	public Vehiculo getVehiculo() {
+		return vehiculo;
+	}
+
+	public void setVehiculo(Vehiculo vehiculo) {
+		this.vehiculo = vehiculo;
+	}
+
 	
 	//metodos propios
 	
-	public void agregarVehiculo(double id, String mod) {
-		Vehiculo nuevoVehiculo = new Vehiculo(id, mod);
-		if(!vehiculos.contains(nuevoVehiculo)) {
-			vehiculos.add(nuevoVehiculo);
-		}
+	public void agregarVehiculo(String patente, String mod) {
+		vehiculo = new Vehiculo(patente, mod);
 	}
 	
 	/* El metodo agregar vehiculo crea una nueva instancia de la clase Vehiculo
@@ -29,13 +34,7 @@ public class Cliente extends UsuarioABS{
 	 * de la clase List, que invoca al metodo equals() de los obj vehiculo.
 	 * */
 	
-	public void eliminarVehiculo(Vehiculo vehiculo) {
-		vehiculos.remove(vehiculo);
-	}
 	
-	public List<Vehiculo> getVehiculos(){
-		return vehiculos;
-	}
 	
 	
 	//metodo heredado y sobreescrito

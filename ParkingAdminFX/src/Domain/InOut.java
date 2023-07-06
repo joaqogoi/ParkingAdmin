@@ -93,6 +93,14 @@ public class InOut {
 	public Encargado getEncargado() {
 		return encargado;
 	}
+
+	public static int getContadorIDs() {
+		return contadorIDs;
+	}
+
+	public static void setContadorIDs(int contadorIDs) {
+		InOut.contadorIDs = contadorIDs;
+	}
 	
 	
 }

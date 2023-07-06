@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
 import Domain.*;
+import Service.*;
 
 public class Main extends Application {
 
@@ -42,7 +43,7 @@ public class Main extends Application {
 			
 // Creacion de textos, cuadros de texto y botones
 			Label sucursales = new Label("Sucursales");
-			ComboBox sucursal = new ComboBox();
+			ComboBox<String> sucursal = new ComboBox<String>();
 			sucursal.setItems(FXCollections.observableArrayList("Sucursal 1", "Sucursal 2", "Sucursal 3"));
 			Label encargado = new Label("Datos del encargado");
 			Label encargadoN = new Label("Nombre");
@@ -92,17 +93,14 @@ public class Main extends Application {
 				
 // Obtener los datos que se ingresan
 				String nombreCliente = textfield3.getText();
-				String dniCliente = textfield4.getText();
+				double dniCliente = Double.parseDouble(textfield4.getText());
 				String modeloVehiculo = textfield5.getText();
 				String patenteVehiculo = textfield6.getText();
 				
 
-				// Instancia de la clase Cliente
-				// UsuarioABS datosCliente = new UsuarioABS();
-				// Asignar valores
-				// Cliente.setName(nombreCliente);
-				// Acceder a las variables de Cliente y Vehiculo
-				// String NombreC = Cliente.getName();
+// Instancia de la clase Cliente
+				SucursalService sucursalService = new SucursalService(null);
+sucursalService.agregarEventoInOut(dniCliente, nombreCliente, patenteVehiculo, modeloVehiculo);
 
 			});
 			
@@ -123,7 +121,7 @@ public class Main extends Application {
 // Mostrar pagina
 			ingresoP.setScene(ingreso);
 			ingresoP.show();
-
+			 
 		});
 		
 // Ajustes de pantalla Registrar salida
@@ -140,4 +138,6 @@ public class Main extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
-	}}
+	}
+
+}
