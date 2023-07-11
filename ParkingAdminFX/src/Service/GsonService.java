@@ -11,6 +11,8 @@ import com.google.gson.JsonArray;
 import Domain.Encargado;
 import Domain.InOut;
 import Domain.Sucursal;
+import Exception.DataReadingException;
+import Data.*;
 
 public class GsonService implements I_GsonService{
 	private Gson gson;
@@ -86,8 +88,15 @@ public class GsonService implements I_GsonService{
 	}
 
 	@Override
-	public List<Sucursal> convertirLista(String nombreDelArchivo) {
-		List<JsonElement> listaJsonElement = instanciaData.toList(nombreDelArchivo);
+	public List<Sucursal> convertirLista() throws DataReadingException {
+		DataImplements instanciaData = new DataImplements();
+		try {
+			instanciaData = new DataImplements();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		List<JsonElement> listaJsonElement = instanciaData.toList();
 		List<Sucursal> listaSucursales = new ArrayList<>();
 		
 		for(JsonElement jsonElement : listaJsonElement) {

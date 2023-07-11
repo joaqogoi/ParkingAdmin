@@ -1,19 +1,20 @@
 package Service;
 
 import Domain.*;
+import Exception.DataReadingException;
+import Exception.DataWritingExcepction;
 
 import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.JsonElement;
 
+import Data.DataImplements;
+
 public class SucursalService {
-	private GsonService gsonService;
 	private Sucursal sucursalActiva;
 	private Encargado encargadoActivo;
 	
-	public SucursalService(GsonService gsonService) {
-		//instancia del paq Gson para la implementacion de sus metodos. 
-		this.gsonService = gsonService;
+	public SucursalService() {
 	}
 	
 	//Metodos para manipular la sucursalActiva:
@@ -21,9 +22,9 @@ public class SucursalService {
 		sucursalActiva = new Sucursal(direccion, valorXhora);
 	}
 	
-	public void cargarSucursal(int idSucursal) {
+	public void cargarSucursal(int idSucursal) throws DataReadingException {
 		GsonService gsonService = new GsonService();
-		List<Sucursal> listaSucursales = gsonService.convertirLista("baseDeDatos.Json");
+		List<Sucursal> listaSucursales = gsonService.convertirLista();
 		//recorremos la lista de sucursales de la base de datos y seleccionamos la sucursalActiva
 		for (Sucursal sucursal : listaSucursales) {
 			if(sucursal.getId() == idSucursal) {
@@ -46,9 +47,9 @@ public class SucursalService {
 		}
 	}
 	
-	public void guardarSucursal() {
+	public void guardarSucursal() throws DataWritingExcepction, DataReadingException {
 		GsonService gsonService = new GsonService();
-		List<Sucursal> listaSucursales = gsonService.convertirLista("baseDeDatos.json");
+		List<Sucursal> listaSucursales = gsonService.convertirLista();
 		
 		//busqueda de sucursalActiva por id
 		Sucursal sucursalActualizada = null;
@@ -64,7 +65,8 @@ public class SucursalService {
 			//convetir sucursal a Json
 			JsonElement jsonElement = gsonService.convertirJavaToJson(sucursalActualizada);
 			//guarda Json en la base de datos
-			instanciaDeData.guardarEnData(jsonElement);
+			DataImplements instanciaData = new DataImplements();
+			instanciaData.actualizarArchivo(jsonElement);
 		} else {
 			System.out.println("No se encuentra sucursal activa");
 		}
@@ -81,6 +83,29 @@ public class SucursalService {
 		return listaEncargados;
 	}
 	
+	public List<String> obtenerIdSucursales() throws DataReadingException{
+		GsonService gsonService = new GsonService();
+		List<String> listaSucu = new ArrayList<>();
+		List<Sucursal> sucursales = gsonService.convertirLista();
+		for (Sucursal sucursal : sucursales) {
+			int idSucursal = sucursal.getId();
+			listaSucu.add("Sucursal" + idSucursal);
+		}
+		return listaSucu;
+	}
+	
+	public String[] obtenerIdSucursalesPrueba(){
+		List<String> prueba = new ArrayList<>();
+		String sucu1 = "Sucu1";
+		String sucu2 = "Sucu2";
+		String sucu3 = "Sucu3";
+		prueba.add(sucu3 + sucu1 + sucu2);
+		
+		String[] array = prueba.toArray(new String[0]);
+		
+		return array;
+	
+	}
 	
 	//Metodos para manipular la lista de encargados:
 	public void crearEncargado(double id, String nombre) {
