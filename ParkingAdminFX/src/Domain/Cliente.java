@@ -11,7 +11,8 @@ public class Cliente extends UsuarioABS{
 		super(id, name);	
 	}
 	
-	
+
+
 	public Vehiculo getVehiculo() {
 		return vehiculo;
 	}

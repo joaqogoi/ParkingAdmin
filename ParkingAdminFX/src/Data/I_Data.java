@@ -5,10 +5,10 @@ import Exception.*;
 
 interface I_Data {
 	
-	    void crearArchivo(JsonElement jsonElement) throws DataAccessException;
+	    void crearArchivo() throws DataAccessException;
 		boolean existeArchivo(String fileName) throws DataAccessException;
 		void actualizarArchivo(JsonElement jsonElement) throws DataWritingExcepction;
-		List<JsonElement> toList() throws DataReadingException;
+		List<JsonElement> toList() throws DataReadingException, DataAccessException;
 		
 
 	}

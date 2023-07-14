@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Sucursal {
 	private static int contadorIds = 0;
-	private final int id;
+	public int id;
 	private String direccion;
 	private double valorXhora;
 	private List<Encargado> listaEncargados;
@@ -16,6 +16,15 @@ public class Sucursal {
 		this.valorXhora = valorXhora;
 		this.listaInOut = new ArrayList<>();
 		this.listaEncargados = new ArrayList<>();
+	}
+
+	public Sucursal(int id2, String direccion2, double valorXhora2, List<Encargado> listaEncargados2, List<InOut> listaInOut2) {
+		this.id = id2;
+		this.direccion = direccion2;
+		this.valorXhora = valorXhora2;
+		this.listaEncargados = listaEncargados2;
+		this.listaInOut = listaInOut2;
+
 	}
 
 	public int getId() {
@@ -45,6 +54,10 @@ public class Sucursal {
 
 	public List<Encargado> getListaEncargados(){
 		return listaEncargados;
+	}
+	
+	public void setListaEncargados(List<Encargado> listaEncargados) {
+		this.listaEncargados = listaEncargados;
 	}
 	
 	public void agregarEncargado (Encargado encargado) {

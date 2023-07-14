@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "direccion": "belgrano",
+    "valorXhora": 100.0,
+    "listaEncargados": [
+      {
+        "id": 12.0,
+        "name": "juan"
+      },
+      {
+        "id": 11.0,
+        "name": "pegro"
+      }
+    ],
+    "listaInOut": []
+  }
+]

@@ -1,16 +1,17 @@
 package Domain;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class InOut {
 	//Attributes
 	private static int contadorIDs = 0;
-	private final int id;
+	private int id;
 	private Encargado encargado;
 	private Cliente cliente;
 	private Sucursal sucursal;
-	private LocalDateTime in;
-	private LocalDateTime out;
+	private String in;
+	private String out;
 	private Factura facturacion;
 	
 	//Constructor
@@ -19,19 +20,29 @@ public class InOut {
 		this.cliente = cliente;
 		this.sucursal = sucursal;
 		this.encargado = encargado;
-		this.in = LocalDateTime.now();
+		this.in = LocalDateTime.now().toString();
 		this.facturacion = null;
 	}
 	
+	public InOut(int id2, String in2, String out2, Cliente cliente2, Factura facturacion2) {
+		this.id = id2;
+		this.in = in2;
+		this.out = out2;
+		this.cliente = cliente2;
+		this.facturacion = facturacion2;
+	}
+
 	public void registrarOut() {
-		this.out = LocalDateTime.now();
+		this.out = LocalDateTime.now().toString();
 		double horasPermanencia = calcularPermanencia();
 		double montoFacturacion = calcularFacturacion(horasPermanencia);
 		this.facturacion = new Factura(id, horasPermanencia,montoFacturacion);
 	}
 	
 	public double calcularPermanencia() {
-		Duration duracion = Duration.between(in, out);
+		LocalDateTime inDateTime = LocalDateTime.parse(in, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		LocalDateTime outDateTime = LocalDateTime.parse(out, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		Duration duracion = Duration.between(inDateTime, outDateTime);
 		long segundos = duracion.getSeconds();
 		double horas = segundos / 3600.0;
 		return horas;
@@ -46,19 +57,19 @@ public class InOut {
 	//rodearlo con un trycatch no es simplemente una manera de emascarar el problema?
 	
 
-	public LocalDateTime getIn() {
+	public String getIn() {
 		return in;
 	}
 
-	public void setIn(LocalDateTime in) {
+	public void setIn(String in) {
 		this.in = in;
 	}
 
-	public LocalDateTime getOut() {
+	public String getOut() {
 		return out;
 	}
 
-	public void setOut(LocalDateTime out) {
+	public void setOut(String out) {
 		this.out = out;
 	}
 

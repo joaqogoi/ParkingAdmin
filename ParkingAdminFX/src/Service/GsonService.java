@@ -1,6 +1,7 @@
 package Service;
 
 import java.util.List;
+
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
@@ -8,19 +9,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 
-import Domain.Encargado;
-import Domain.InOut;
-import Domain.Sucursal;
-import Exception.DataReadingException;
+import Domain.*;
+import Exception.DataAccessException;
+import Exception.DataWritingExcepction;
 import Data.*;
 
 public class GsonService implements I_GsonService{
-	private Gson gson;
-	
-	//contructor
 	//instancia del paquete Gson para la implementacion de sus metodos
 	public GsonService() {
-		this.gson = new Gson();
+		new Gson();
 	}
 
 	//metodos para la manipulacion entre el paqService y el paqData
@@ -83,28 +80,87 @@ public class GsonService implements I_GsonService{
 	
 	@Override
 	public Sucursal convertirJsonToJava(JsonElement jsonElement) {
-		Sucursal sucursal = gson.fromJson(jsonElement, Sucursal.class);
+		JsonObject jsonObject = jsonElement.getAsJsonObject();
+		int id = jsonObject.get("id").getAsInt();
+		String direccion = jsonObject.get("direccion").getAsString();
+		double valorXhora = jsonObject.get("valorXhora").getAsDouble();
+		
+		List<Encargado> listaEncargados = convetirJsonArrayToEncargados(jsonObject.getAsJsonArray("listaEncargados"));
+		List<InOut> listaInOut = convetirJsonArrayToInOut(jsonObject.getAsJsonArray("listaInOut"));
+		
+		Sucursal sucursal = new Sucursal(id, direccion,valorXhora, listaEncargados,listaInOut);
 		return sucursal;
 	}
+	
+	private List<Encargado> convetirJsonArrayToEncargados(JsonArray jsonArray){
+		List<Encargado> listaEncargados = new ArrayList<>();
+		for (JsonElement jsonElement : jsonArray) {
+			JsonObject jsonObject = jsonElement.getAsJsonObject();
+			double id = jsonObject.get("id").getAsDouble();
+			String name = jsonObject.get("name").getAsString();
+			Encargado encargado = new Encargado(id, name);
+			listaEncargados.add(encargado);
+		}
+		
+		return listaEncargados;	
+	}
+	
+	private List<InOut> convetirJsonArrayToInOut(JsonArray jsonArray){
+		List<InOut> listaInOut = new ArrayList<>();
+		for (JsonElement jsonElement : jsonArray) {
+			JsonObject jsonObject = jsonElement.getAsJsonObject();
+			int id = jsonObject.get("id").getAsInt();
+			String in = jsonObject.get("in").getAsString();
+			String out = jsonObject.get("out").getAsString();
+			
+			JsonObject clienteJson = jsonObject.getAsJsonObject("cliente");
+			double clienteId = clienteJson.get("id").getAsDouble();
+			String clienteName = clienteJson.get("name").getAsString();
+			
+			JsonObject vehiculoJson = jsonObject.getAsJsonObject("vehiculo");
+			String patente = vehiculoJson.get("patente").getAsString();
+			String mod = vehiculoJson.get("mod").getAsString();
+			Vehiculo vehiculo = new Vehiculo(patente, mod);
+			Cliente cliente = new Cliente(clienteId, clienteName);
+			cliente.setVehiculo(vehiculo);
+			
+			JsonObject facturaJson = jsonObject.getAsJsonObject("facturacion");
+			int facturaId = facturaJson.get("id").getAsInt();
+			double facturaTime = facturaJson.get("time").getAsDouble();
+			double facturaMonto = facturaJson.get("monto").getAsDouble();
+			Factura facturacion = new Factura(facturaId, facturaTime, facturaMonto);
+			
+			InOut eventoInOut = new InOut(id, in, out,cliente, facturacion);
+			listaInOut.add(eventoInOut);
+		}
+		return listaInOut;
+	}	
+	
 
 	@Override
-	public List<Sucursal> convertirLista() throws DataReadingException {
+	public List<Sucursal> convertirLista() throws DataAccessException {
 		DataImplements instanciaData = new DataImplements();
+		List<JsonElement> listaJsonElement = new ArrayList<>();
 		try {
-			instanciaData = new DataImplements();
+			listaJsonElement = instanciaData.toList();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DataAccessException("Error al convertir la lista");
 		}
-		List<JsonElement> listaJsonElement = instanciaData.toList();
-		List<Sucursal> listaSucursales = new ArrayList<>();
 		
+		List<Sucursal> listaSucursales = new ArrayList<>();
 		for(JsonElement jsonElement : listaJsonElement) {
 			Sucursal sucursal = convertirJsonToJava(jsonElement);
 			listaSucursales.add(sucursal);
 		}
 		return listaSucursales;
 	}
+
+	@Override
+	public void guardarEnData(JsonElement jsonElement) throws DataWritingExcepction {
+		DataImplements instanciaData = new DataImplements();
+		instanciaData.actualizarArchivo(jsonElement);
+	}
+
 
 	//convetirLista:
 	/* En este metodo se recorre el arreglo de JsonElements proporcionado por

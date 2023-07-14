@@ -2,6 +2,7 @@ package Domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class Encargado extends UsuarioABS{
@@ -18,8 +19,9 @@ public class Encargado extends UsuarioABS{
 		LocalDate fechaActual = LocalDate.now();
 		
 		for (InOut eventoInOut : listaInOut) {
-			LocalDateTime out = eventoInOut.getOut();
-			LocalDate fechaOut = out.toLocalDate();
+			String out = eventoInOut.getOut();
+			LocalDateTime outDateTime = LocalDateTime.parse(out, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+			LocalDate fechaOut = outDateTime.toLocalDate();
 			
 			if(fechaOut.equals(fechaActual) && eventoInOut.getFacturacion() != null) {
 				facturacionXdia += eventoInOut.getFacturacion().getMonto();
