@@ -63,6 +63,10 @@ public class Sucursal {
 	public void agregarEncargado (Encargado encargado) {
 		listaEncargados.add(encargado);
 	}
+
+	public void setListaInOut(ArrayList<InOut> listaInOut) {
+		this.listaInOut = listaInOut;
+	}
 	
 	
 	

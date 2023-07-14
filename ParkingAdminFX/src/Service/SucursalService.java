@@ -2,7 +2,9 @@ package Service;
 
 import Domain.*;
 
+
 import Exception.DataAccessException;
+import java.text.DecimalFormat;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -43,7 +45,9 @@ public class SucursalService {
 				sucursalActiva = sucursal;
 				System.out.println(sucursalActiva.getDireccion());
 				//limpiamos la lista de eventos InOut para comenzar el turno
-				sucursalActiva.getListaInOut().clear();
+				sucursalActiva.setListaInOut(new ArrayList<>());
+				String idSucu = sucursalActiva.getDireccion();
+				System.out.println(idSucu);
 				InOut.setContadorIDs(ultimoRegistro);
 				break;
 			}
@@ -80,10 +84,12 @@ public class SucursalService {
 	public String[] obtenerNombresEncargados(){
 		List<String> listaEncargados = new ArrayList<>();
 		List<Encargado> encargados = sucursalActiva.getListaEncargados();
+		DecimalFormat decimalFormat = new DecimalFormat("#.##########");
 		for (Encargado encargado : encargados) {
 			String nombreEncargado = encargado.getName();
 			Double idEncargado = encargado.getId();
-			String idEncargadoString = idEncargado.toString();
+			
+			String idEncargadoString = decimalFormat.format(idEncargado);
 			listaEncargados.add(nombreEncargado + " " + idEncargadoString);
 		}
 		String[] array = listaEncargados.toArray(new String[0]);
@@ -96,11 +102,13 @@ public class SucursalService {
 		try {
 			List<Sucursal> sucursales = gsonService.convertirLista();
 			if(sucursales.isEmpty()) {
+				System.out.println("lista vacia");
 				return new String[0];
 			}
 			for (Sucursal sucursal : sucursales) {
 				int idSucursal = sucursal.getId();
-				listaSucu.add("Sucursal" + idSucursal);
+				String sucursalString = "Sucursal " + String.valueOf(idSucursal);
+				listaSucu.add(sucursalString);
 			}
 		} catch (DataAccessException e) {
 			System.err.println("Error al obtener la lista de sucursales: " + e.getMessage());
@@ -170,12 +178,15 @@ public class SucursalService {
 	
 	public void establecerEncargadoActivo (double idEncargadoAct) {
 		List<Encargado> listaEncargados = sucursalActiva.getListaEncargados();
+		
 		for (Encargado encargado : listaEncargados) {
+			
 			if (encargado.getId() == idEncargadoAct) {
 				encargadoActivo = encargado;
-			}
+			} else {
+				}
+			System.out.println("Encargado activo: " + encargadoActivo.getName());				
 		}
-		System.out.println("No se encontro ningun encargado con este dni");
 	}
 	
 	public Encargado obtenerEncargadoActivo() {
@@ -211,6 +222,7 @@ public class SucursalService {
 		String nombreCliente = eventoInOut.getCliente().getName();
 		String patenteVehiculo = eventoInOut.getCliente().getVehiculo().getPatente();
 		String modVehiculo = eventoInOut.getCliente().getVehiculo().getMod();
+
 		
 		datosEvento.add(encargadoActivo);
 		datosEvento.add(idEvento);
@@ -223,33 +235,78 @@ public class SucursalService {
 		return array;
 	}
 	
-	public void registrarSalida(double idEvento) {
+	public String[] registrarSalida(double idEvento) {
+		
 		if(sucursalActiva != null) {
 			List<InOut> eventosInOut = sucursalActiva.getListaInOut();
+			boolean eventoEncontrado = false;
+			
 			for(InOut evento : eventosInOut) {
 				if(evento.getId() == idEvento) {
 					evento.registrarOut();
-					System.out.println("Se ha registrado la salida del ingreso con el id:" + idEvento);
-					return; //este metodo no recibe ningun retorno pero el return indica la finalizacion del metodo
-				}
+					eventoEncontrado = true;
+					return obtenerDatosEventoOut(evento);
+				}	
 			}
-			System.out.println("No se encontro un ingreso con este ID");
-		} else {
-			System.out.println("No se puede registrar una salida por que no existe una sucursal activa.");
-		}
+			if (!eventoEncontrado) {
+				System.out.println("No se encontro un ingreso con este id");
+			}
+		} 
+		return new String[0];
 	}
 	
-	public List<InOut> obtenerEventosSinRegistroDeSalida(){
+	public String[] obtenerDatosEventoOut(InOut eventoInOut){
+		List<String> datosEvento = new ArrayList<>();
+		
+		String encargadoActivo = eventoInOut.getEncargado().getName();
+		String idEvento = String.valueOf(eventoInOut.getId());
+		String horarioIngreso = eventoInOut.getIn().toString();
+		String nombreCliente = eventoInOut.getCliente().getName();
+		String patenteVehiculo = eventoInOut.getCliente().getVehiculo().getPatente();
+		String modVehiculo = eventoInOut.getCliente().getVehiculo().getMod();
+		String horarioSalida = eventoInOut.getOut();
+		String facturacion = String.valueOf(eventoInOut.getFacturacion().getMonto()) + "$";
+		
+		datosEvento.add(encargadoActivo);
+		datosEvento.add(idEvento);
+		datosEvento.add(horarioIngreso);
+		datosEvento.add(horarioSalida);
+		datosEvento.add(facturacion);
+		datosEvento.add(nombreCliente);
+		datosEvento.add(patenteVehiculo);
+		datosEvento.add(modVehiculo);
+		
+		String[] array = datosEvento.toArray(new String[0]);
+		return array;
+	}
+	
+	
+	
+	public boolean obtenerEventosSinRegistroDeSalida(){
 		List<InOut> eventosSinSalida = new ArrayList<>();
+		boolean existenEventosSinSalida = false;
 		if (sucursalActiva != null) {
 			List<InOut> eventosInOut = sucursalActiva.getListaInOut();
 			for (InOut evento : eventosInOut) {
 				if (evento.getOut() == null) {
 					eventosSinSalida.add(evento);
+					existenEventosSinSalida = true;
 				}
 			}
 		}
-		return eventosSinSalida;
+		return existenEventosSinSalida;
 	}
 	
+	public double calcularFacturacionDelDia() {
+		double sumaMontos = 0.0;
+		
+		List<InOut> eventos = sucursalActiva.getListaInOut();
+		for(InOut evento : eventos) {
+			Factura factura = evento.getFacturacion();
+			if(factura != null) {
+				sumaMontos += factura.getMonto();
+			}
+		}
+		return sumaMontos;
+	}	
 }

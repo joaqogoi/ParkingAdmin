@@ -1,16 +1,16 @@
 [
   {
     "id": 1,
-    "direccion": "belgrano",
+    "direccion": "pardo",
     "valorXhora": 100.0,
     "listaEncargados": [
       {
-        "id": 12.0,
-        "name": "juan"
+        "id": 323232.0,
+        "name": "carlos"
       },
       {
-        "id": 11.0,
-        "name": "pegro"
+        "id": 363636.0,
+        "name": "pilar"
       }
     ],
     "listaInOut": []

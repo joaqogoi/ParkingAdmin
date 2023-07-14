@@ -86,7 +86,14 @@ public class GsonService implements I_GsonService{
 		double valorXhora = jsonObject.get("valorXhora").getAsDouble();
 		
 		List<Encargado> listaEncargados = convetirJsonArrayToEncargados(jsonObject.getAsJsonArray("listaEncargados"));
-		List<InOut> listaInOut = convetirJsonArrayToInOut(jsonObject.getAsJsonArray("listaInOut"));
+		
+		List<InOut> listaInOut;
+		JsonArray jsonArray = jsonObject.getAsJsonArray("listaInOut");
+		if (jsonArray != null && jsonArray.size() > 0) {
+			listaInOut = convetirJsonArrayToInOut(jsonArray);
+		} else {
+			listaInOut = new ArrayList<>();
+		}
 		
 		Sucursal sucursal = new Sucursal(id, direccion,valorXhora, listaEncargados,listaInOut);
 		return sucursal;

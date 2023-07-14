@@ -59,12 +59,43 @@ public class Main extends Application {
 				
 				String[] listaSucursales1 = sucuService1.obtenerIdSucursales();
 				ObservableList<String> opcionesSucursales = FXCollections.observableArrayList(listaSucursales1);
-				sucursal.setItems(opcionesSucursales);	
+				sucursal.setItems(opcionesSucursales);
+				
 				Label encargados = new Label("Encargados");
 				ComboBox<String> encargado = new ComboBox<>();
-				String[] listaEncargados = sucuService1.obtenerNombresEncargados();
-				ObservableList<String> opcionesEncargados = FXCollections.observableArrayList(listaEncargados);
-				encargado.setItems(opcionesEncargados);
+
+				
+				sucursal.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+					System.out.println(newValue);
+				    if (newValue != null) {
+				    	
+				    	String numericValue = newValue.replaceAll("[^\\d]", "");
+				    	System.out.println(newValue);
+				    	idSucursal = Integer.parseInt(numericValue);				    	
+				    	try {
+							sucuService1.cargarSucursal(idSucursal);
+						} catch (DataReadingException e) {
+							e.printStackTrace();
+						} catch (DataAccessException e1) {
+							e1.printStackTrace();
+						}
+				    	
+				    	encargados.setVisible(true);
+				    	encargado.setVisible(true);
+				    	
+				    	String[] listaEncargados = sucuService1.obtenerNombresEncargados();
+						ObservableList<String> opcionesEncargados = FXCollections.observableArrayList(listaEncargados);
+						encargado.setItems(opcionesEncargados);
+				        
+				    	
+				    	} else {
+				    	encargados.setVisible(false);
+				    	encargado.setVisible(false);
+				    
+				    	}
+				
+						});
+					
 				
 				Button button = new Button("Registrar ingreso");
 				Button button2 = new Button("Registrar salida");
@@ -93,42 +124,16 @@ public class Main extends Application {
 				button5.setVisible(false);
 
 				
-				sucursal.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 				
-				    if (newValue != null) {
-				    	String numericValue = newValue.replaceAll("[^\\d]", "");
-				    	idSucursal = Integer.parseInt(numericValue);
-				    	
-				    	try {
-							sucuService1.cargarSucursal(idSucursal);
-						} catch (DataReadingException e) {
-							e.printStackTrace();
-						} catch (DataAccessException e1) {
-							e1.printStackTrace();
-						}
-				    	
-				    	System.out.println(idSucursal);
-				    	
-				        encargados.setVisible(true);
-				        encargado.setVisible(true);
-				    	
-				    } else {
-				        encargados.setVisible(false);
-				        encargado.setVisible(false);
-				    
-				    }
-				
-				});
 		   encargado.getSelectionModel().selectedItemProperty().addListener((observableE, oldValueE, newValueE) -> {
 
 			    if (newValueE != null) {
 			    	String numericValue = newValueE.replaceAll("[^\\d]", "");
-			    	idEncargado = Integer.parseInt(numericValue);
+			    	idEncargado = Double.parseDouble(numericValue);
+			    	
 			    	
 			    	sucuService1.establecerEncargadoActivo(idEncargado);
-			    	
-			    	System.out.println(idEncargado);
-			    	
+			    				    	
 			        button.setVisible(true);
 					button2.setVisible(true);
 					button3.setVisible(true);
@@ -184,12 +189,16 @@ public class Main extends Application {
 						String modeloVehiculo = textfield5.getText();
 						String patenteVehiculo = textfield6.getText();
 						
-						String[] datosEvento = sucuService1.agregarEventoInOutPrueba(dniCliente, nombreCliente, patenteVehiculo, modeloVehiculo);
+						String[] datosEvento = sucuService1.agregarEventoInOut(dniCliente, nombreCliente, patenteVehiculo, modeloVehiculo);
 						ListView<String> facturaDatos = new ListView<>();
 						ObservableList<String> datosF = FXCollections.observableArrayList(datosEvento);
 						facturaDatos.setItems(datosF);
 						mostrarDatos.add(facturaDatos, 0, 1);
 						
+						textfield3.setText("");
+						textfield4.setText("");
+						textfield5.setText("");
+						textfield6.setText("");
 		// Mostrar pantalla				
 						Scene mostrarD = new Scene(mostrarDatos, 400, 200);
 						datos.setScene(mostrarD);
@@ -232,9 +241,26 @@ public class Main extends Application {
 					Button finalizar = new Button("Finalizar");			
 
 		// Ajustes del boton guardar
-					finalizar.setOnAction(evento2 -> {	
+					finalizar.setOnAction(evento2 -> {
+						Stage datos2 = new Stage();
+						datos2.setTitle("Factura");
+						GridPane mostrarDatos = new GridPane();
+						mostrarDatos.setPadding(new Insets(10));
+						mostrarDatos.setVgap(4);
+						mostrarDatos.setHgap(6);
+						Double idFactura = Double.parseDouble(textfield7.getText());
+						String[] datosSalida = sucuService1.registrarSalida(idFactura);
 						
-					
+						ListView<String> facturaDatos = new ListView<>();
+						ObservableList<String> datosF = FXCollections.observableArrayList(datosSalida);
+						facturaDatos.setItems(datosF);
+						mostrarDatos.add(facturaDatos, 0, 1);
+						
+		// Mostrar pantalla				
+						Scene mostrarD = new Scene(mostrarDatos, 400, 200);
+						datos2.setScene(mostrarD);
+						datos2.show();
+									
 					});
 								
 		// Agregar los botones a la pantalla y seleccionar su ubicacion
@@ -277,11 +303,29 @@ public class Main extends Application {
 					Button finalizar = new Button("Terminar jornada");
 		// Ajustes del boton guardar
 					guardarF.setOnAction(evento2 -> {	
-																});
+						double facturacionDelDia = sucuService1.calcularFacturacionDelDia();
+						//devuelve un double con el total de la facturacion que hay que mostrar en pantalla
+						
+					});
 		// Ajustes del boton terminar jornada
-					finalizar.setOnAction(evento3 -> {	
-					Stage stage = (Stage) finalizar.getScene().getWindow();
-				    stage.close();
+					finalizar.setOnAction(evento3 -> {
+						
+						boolean salida = sucuService1.obtenerEventosSinRegistroDeSalida();
+						if(salida = true) {
+							String cierreStatus = "Existen ingresos que no registran salida";
+						} else {
+							
+							try {
+								sucuService1.guardarSucursal();
+							} catch (DataAccessException e1) {
+								e1.printStackTrace();
+							}
+							
+							Stage stage = (Stage) finalizar.getScene().getWindow();
+						    stage.close();
+						}
+					
+					
 						  });
 
 										

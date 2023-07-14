@@ -2,6 +2,7 @@ package Domain;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class InOut {
 	//Attributes
@@ -20,7 +21,7 @@ public class InOut {
 		this.cliente = cliente;
 		this.sucursal = sucursal;
 		this.encargado = encargado;
-		this.in = LocalDateTime.now().toString();
+		this.in = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS).toString();
 		this.facturacion = null;
 	}
 	
@@ -33,16 +34,16 @@ public class InOut {
 	}
 
 	public void registrarOut() {
-		this.out = LocalDateTime.now().toString();
-		double horasPermanencia = calcularPermanencia();
+		this.out = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS).toString();
+		double horasPermanencia = calcularPermanencia(out);
 		double montoFacturacion = calcularFacturacion(horasPermanencia);
 		this.facturacion = new Factura(id, horasPermanencia,montoFacturacion);
 	}
 	
-	public double calcularPermanencia() {
-		LocalDateTime inDateTime = LocalDateTime.parse(in, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		LocalDateTime outDateTime = LocalDateTime.parse(out, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		Duration duracion = Duration.between(inDateTime, outDateTime);
+	public double calcularPermanencia(String out) {
+		LocalDateTime inDateTime = LocalDateTime.parse(in, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+		LocalDateTime outDateTime = LocalDateTime.parse(out, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+		Duration duracion = Duration.between(inDateTime.truncatedTo(ChronoUnit.MICROS), outDateTime.truncatedTo(ChronoUnit.MICROS));
 		long segundos = duracion.getSeconds();
 		double horas = segundos / 3600.0;
 		return horas;
